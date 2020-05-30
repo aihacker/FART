@@ -1,5 +1,6 @@
 #! /usr/bin/python2.7
 # -*- coding: utf8 -*-
+
 import sys
 import struct
 import array
@@ -1852,24 +1853,26 @@ def parse_encoded_annotation(lex_object,content,is_root=False):
 		offset += parse_encoded_value(lex_object,content[offset:],is_root)
 	return offset
 def parse_annotation_set_item(lex_object,offset,is_root=False):
-
-	size, = struct.unpack_from("I",lex_object.m_content,offset)
-	offset += struct.calcsize("I")
-	for i in xrange(0,size):
-		off,=struct.unpack_from("I",lex_object.m_content,offset)
-		visibility, = struct.unpack_from("B",lex_object.m_content,off)
-		if visibility == 0:
-			print "VISIBILITY_BUILD",
-		elif visibility == 1: 
-			print "VISIBILITY_RUNTIME",
-		elif visibility == 2: 
-			print "VISIBILITY_SYSTEM",
-		else:
-			print "visibility is unknow %02x"%visibility
-		off += struct.calcsize("B")
-		parse_encoded_annotation(lex_object,lex_object.m_content[off:],True)
+	try:
+		size, = struct.unpack_from("I",lex_object.m_content,offset)
 		offset += struct.calcsize("I")
-		print ""
+		for i in xrange(0,size):
+			off,=struct.unpack_from("I",lex_object.m_content,offset)
+			visibility, = struct.unpack_from("B",lex_object.m_content,off)
+			if visibility == 0:
+				print "VISIBILITY_BUILD",
+			elif visibility == 1:
+				print "VISIBILITY_RUNTIME",
+			elif visibility == 2:
+				print "VISIBILITY_SYSTEM",
+			else:
+				print "visibility is unknow %02x"%visibility
+			off += struct.calcsize("B")
+			parse_encoded_annotation(lex_object,lex_object.m_content[off:],True)
+			offset += struct.calcsize("I")
+			print ""
+	except Exception as e:
+		print e
 def parse_annotation_set_ref_list(lex_object,offset,is_root=False):
 	size, = struct.unpack_from("I",lex_object.m_content,offset)
 	offset += struct.calcsize("I")
